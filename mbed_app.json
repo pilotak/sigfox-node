@@ -1,0 +1,30 @@
+{
+  "config": {
+    "trace-level": {
+      "help": "Options are TRACE_LEVEL_ERROR,TRACE_LEVEL_WARN,TRACE_LEVEL_INFO,TRACE_LEVEL_DEBUG",
+      "macro_name": "MBED_TRACE_MAX_LEVEL",
+      "value": "TRACE_LEVEL_DEBUG"
+    }
+  },
+  "requires": ["bare-metal", "Wisol", "SHTC3", "BQ35100"],
+  "target_overrides": {
+    "*": {
+      "platform.stdio-baud-rate": 115200,
+      "platform.stdio-convert-newlines": true,
+      "platform.fatal-error-auto-reboot-enabled": true,
+      "target.printf_lib": "std"
+    },
+    "NUCLEO_G071RB": {
+      "mbed-trace.enable": true,
+      "platform.error-all-threads-info": true,
+      "platform.error-filename-capture-enabled": true,
+      "platform.minimal-printf-enable-floating-point": true,
+      "platform.minimal-printf-set-floating-point-max-decimals": 6
+    },
+    "SIGFOX_TEMP_V1": {
+      "target.c_lib": "small",
+      "platform.minimal-printf-enable-floating-point": false,
+      "platform.stdio-minimal-console-only": true
+    }
+  }
+}

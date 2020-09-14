@@ -1,0 +1,9 @@
+mbed-os/
+BUILD/
+mbed_settings.py
+.mbed
+__pycache__/
+BQ35100/
+wisol/
+SHTC3/
+*.code-workspace

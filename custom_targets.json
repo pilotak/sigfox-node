@@ -1,0 +1,6 @@
+{
+  "SIGFOX_TEMP_V1": {
+    "inherits": ["NUCLEO_G031K8"],
+    "components_remove": ["FLASHIAP"]
+  }
+}
