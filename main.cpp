@@ -4,7 +4,7 @@
 #include "BQ35100.h"
 
 I2C i2c(I2C_SDA, I2C_SCL);
-BQ35100 gauge;
+BQ35100 gauge(GAUGE_ENABLE_PIN);
 DigitalIn button(USER_BUTTON, PullUp);
 DigitalOut done(DONE_PIN, 0);
 
@@ -25,32 +25,6 @@ union global_packet_t {
 
 global_packet_t global;
 
-#if MBED_CONF_MBED_TRACE_ENABLE
-Mutex trace_mutex;
-
-static void trace_wait() {
-    trace_mutex.lock();
-}
-
-static void trace_release() {
-    trace_mutex.unlock();
-}
-
-void trace_init() {
-    printf("Start\n");
-    mbed_trace_init();
-    mbed_trace_mutex_wait_function_set(trace_wait);
-    mbed_trace_mutex_release_function_set(trace_release);
-}
-#endif
-
-void factory() {
-    gauge.setGaugeMode(BQ35100::ACCUMULATOR_MODE);
-    gauge.useInternalTemp(true);
-    gauge.setDesignCapacity(3800);
-    gauge.setSecurityMode(BQ35100::SECURITY_SEALED);
-}
-
 void readTemp() {
     SHTC3 sht;
 
@@ -64,23 +38,20 @@ void readTemp() {
         return;
     }
 
-    debug("Temp: %f (%u), humidity: %f(%u)\n",
-          sht.toCelsius(global.data.temp), global.data.temp,
-          sht.toPercentage(global.data.humidity), global.data.humidity
-         );
+#if !defined(NDEBUG)
+    int16_t t = (int16_t)sht.toCelsius(global.data.temp);
+    uint16_t h = (uint16_t)sht.toPercentage(global.data.humidity);
+    debug("Temperature: %i*C, humidity: %u%%\n", t, h);
+#endif
 }
 
 void readBatteryPercentage() {
-    uint8_t percentage;
-
-    if (!gauge.getRemainingPercentage(&percentage)) {
+    if (!gauge.getRemainingPercentage(&global.data.batt)) {
         debug("Get batt remaining failed\n");
         return;
     }
 
-    global.data.batt = percentage;
-
-    debug("Batt remaining: %u%%\n", percentage);
+    debug("Batt remaining: %u%%\n", global.data.batt);
 }
 
 void send() {
@@ -91,46 +62,48 @@ void send() {
         return;
     }
 
-    wisol.sendFrame(global.packet, sizeof(global.packet));
+    debug("Sending: t: %u, h: %u, b :%u\n", global.data.temp, global.data.humidity, global.data.batt);
+
+    if (wisol.sendFrame(global.packet, sizeof(global.packet))) {
+        debug("Sent\n");
+    }
 }
 
 int main() {
-#if MBED_CONF_MBED_TRACE_ENABLE
-    trace_init();
-#endif
-
-    bool button_state;
-    button_state = button.read();
+    bool button_state = (bool)button.read();
     button.mode(PullNone); // save energy
 
     i2c.frequency(400000); // speed up a little
 
-    if (gauge.init(&i2c, GAUGE_ENABLE_PIN)) {
-        if (button_state == true) { // no button pressed
-            if (gauge.enableGauge()) {
-                readTemp();
-                readBatteryPercentage();
-                send();
-
-            } else {
-                debug("Gauge enable failed\n");
-            }
-
-        } else { // button pressed
+    if (gauge.init(&i2c)) {
+        if (button_state == false) {
             debug("Button is pressed\n");
-            gauge.newBattery(0); // use previous capacity
+            gauge.newBattery();
+            ThisThread::sleep_for(100ms);
         }
 
+        if (gauge.startGauge()) {
+            readTemp();
+            readBatteryPercentage();
+            send();
+
+        } else {
+            debug("Gauge enable failed\n");
+        }
+
+        gauge.disableGauge();
+
     } else {
-        debug("Init gauge FAILED\n");
+        debug("Init gauge failed\n");
     }
 
-    gauge.disableGauge(); // this will handle GE pin
-
     // let the timer know we are done
-    done.write(1);
-    ThisThread::sleep_for(1ms);
-    done.write(0);
+    for (auto i = 0; i < 2; i++) {
+        done.write(1);
+        ThisThread::sleep_for(2ms);
+        done.write(0);
+    }
 
+    // We should not get here, but just in case
     ThisThread::sleep_for(rtos::Kernel::wait_for_u32_forever);
 }
