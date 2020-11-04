@@ -26,6 +26,7 @@ jobs:
 
       - name: Install Mbed
         run: |
+          sudo apt-get update
           sudo apt-get install mercurial gcc-arm-none-eabi -y
           python -m pip install --upgrade pip
           pip install mbed-cli
