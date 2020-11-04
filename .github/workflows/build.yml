@@ -1,0 +1,37 @@
+name: build
+
+on:
+  push:
+    paths-ignore:
+      - "README.md"
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+  schedule:
+    - cron: "0 8 1 * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+
+      - name: Install Mbed
+        run: |
+          sudo apt-get install mercurial gcc-arm-none-eabi -y
+          python -m pip install --upgrade pip
+          pip install mbed-cli
+
+      - name: Build
+        if: success()
+        run: |
+          mbed deploy
+          mbed compile -t GCC_ARM -m SIGFOX_TEMP_V1
