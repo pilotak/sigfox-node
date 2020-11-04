@@ -24,10 +24,16 @@ jobs:
         with:
           python-version: '3.7'
 
+      - name: Install ARM GCC
+        run: |
+          cd /tmp
+          wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
+          tar -xvjf gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 > /dev/null
+          export PATH=$PATH:/tmp/gcc-arm-none-eabi-9-2019-q4-major/bin/
+
       - name: Install Mbed
         run: |
-          sudo apt-get update
-          sudo apt-get install mercurial gcc-arm-none-eabi -y
+          sudo apt-get install mercurial -y
           python -m pip install --upgrade pip
           pip install mbed-cli
 
