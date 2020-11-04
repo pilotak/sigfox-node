@@ -58,7 +58,7 @@ void send() {
     Wisol wisol(WISOL_TX, WISOL_RX);
 
     if (!wisol.init()) {
-        debug("Init FAILED\n");
+        debug("Wisol init failed\n");
         return;
     }
 
