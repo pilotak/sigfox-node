@@ -27,16 +27,19 @@ jobs:
       - name: Install ARM GCC
         run: |
           wget -nv https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
-          tar -xjf gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
+          tar -C /bin/ -xjf gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
+          echo "MBED_GCC_ARM_PATH=/bin/gcc-arm-none-eabi-9-2019-q4-major/bin/" >> $GITHUB_ENV
 
       - name: Install Mbed
         run: |
           python -m pip install --upgrade pip
           pip install mbed-cli
 
+      - name: Install dependencies
+        run: |
+          mbed deploy
+
       - name: Build
         if: success()
         run: |
-          mbed config -G GCC_ARM_PATH "$(pwd)/gcc-arm-none-eabi-9-2019-q4-major/bin"
-          mbed deploy
           mbed compile -t GCC_ARM -m SIGFOX_TEMP_V1
