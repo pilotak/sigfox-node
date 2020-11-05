@@ -10,7 +10,7 @@ Below you can find details how to calibrate the battery gauge
 <details>
 <summary>Basic calibration</summary>
 
-Run following code in order to prepare & calibrate the battery gauge. Apply precisely 3.6V to battery clips and place the board to 24°C _(or adjust these values below)_.
+Run following code in order to prepare & calibrate the battery gauge. Apply precisely 3.6V to battery clips. _(or adjust this values below)_.
 
 > **Really important** to power the board via programming header during calibration (no current can flow through battery).
 > Be careful! the board runs at +2V5 so the programmer has to have a same voltage levels or the regulator must not be populated when powering/programming at +3V3.
@@ -166,7 +166,7 @@ int main() {
 <details>
 <summary>Current calibration</summary>
 
-Run following code in order to calibrate flow current for battery gauge. Apply 100mA load _(or adjust these values below)_ between "battery +" and GND (**not** battery -)
+Run following code in order to calibrate flow current for battery gauge. Apply 100mA load _(or adjust this values below)_ between "battery +" and GND (**not** battery -)
 
 ```cpp
 #include "mbed.h"
@@ -303,7 +303,7 @@ int main() {
         }
 
         if (gauge.getTemperature(&data_1)) {
-            // result is actually °C * 100
+            // result is actually "°C * 100"
             debug("Battery temperature: %li*C\n", ((int32_t)data_1 * 10) - 27315);
 
         } else {
@@ -311,7 +311,7 @@ int main() {
         }
 
         if (gauge.getInternalTemperature(&data_1)) {
-            // result is actually °C * 100
+            // result is actually "°C * 100"
             debug("Gauge temperature: %li*C\n", ((int32_t)data_1 * 10) - 27315);
 
         } else {
