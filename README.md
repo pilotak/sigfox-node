@@ -1,4 +1,4 @@
-Sigfox temperature & humidity sensor
+# Sigfox temperature & humidity sensor
 
 [![build](https://github.com/pilotak/sigfox-th-sensor/workflows/build/badge.svg)](https://github.com/pilotak/sigfox-th-sensor/actions)
 [![Framework Badge mbed](https://img.shields.io/badge/framework-mbed-008fbe.svg)](https://os.mbed.com/)
@@ -247,6 +247,7 @@ int main() {
 I2C i2c(I2C_SDA, I2C_SCL);
 BQ35100 gauge(GAUGE_ENABLE_PIN);
 SHTC3 sht;
+Wisol wisol(WISOL_TX, WISOL_RX);
 
 int main() {
     if (gauge.init(&i2c)) {
@@ -271,6 +272,21 @@ int main() {
     } else {
         debug("SHTC3 init failed\n");
         return 0;
+    }
+
+    if (!wisol.init()) {
+        debug("Wisol init failed\n");
+        return 0;
+    }
+
+    uint8_t data[8];
+
+    if (wisol.getId(data)) {
+        debug("Wisol ID: %02X%02X%02X%02X\n", data[0], data[1], data[2], data[3]);
+    }
+
+    if (wisol.getPac(data)) {
+        debug("Wisol PAC: %02X%02X%02X%02X%02X%02X%02X%02X\n", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
     }
 
     while (1) {

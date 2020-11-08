@@ -8,64 +8,81 @@ BQ35100 gauge(GAUGE_ENABLE_PIN);
 DigitalIn button(USER_BUTTON, PullUp);
 DigitalOut done(DONE_PIN, 0);
 
-struct global_data_t {
-    uint16_t temp;
-    uint16_t humidity;
-    uint8_t batt;
-};
+uint8_t temp = UCHAR_MAX;
+uint8_t humidity = UCHAR_MAX;
+uint8_t batt_percentage = UCHAR_MAX;
 
-union global_packet_t {
-    global_data_t data = {
-        USHRT_MAX,
-        0,
-        UCHAR_MAX
-    };
-    uint8_t packet[5];
-};
+uint16_t round10(uint16_t number) {
+    uint8_t rem = number % 10;
+    return rem >= 5 ? (number - rem + 10) : (number - rem);
+}
 
-global_packet_t global;
-
-void readTemp() {
+void readSensor() {
     SHTC3 sht;
+    uint16_t raw_temp;
+    uint16_t raw_humidity;
 
     if (!sht.init(&i2c)) {
         debug("SHT init failed\n");
         return;
     }
 
-    if (!sht.read(&global.data.temp, &global.data.humidity, true)) {
+    if (!sht.read(&raw_temp, &raw_humidity, true)) { // low power mode
         debug("SHT read failed\n");
         return;
     }
 
-#if !defined(NDEBUG)
-    int16_t t = (int16_t)sht.toCelsius(global.data.temp);
-    uint16_t h = (uint16_t)sht.toPercentage(global.data.humidity);
-    debug("Temperature: %i*C, humidity: %u%%\n", t, h);
-#endif
+    if (raw_temp < 1872) { // -40°C
+        temp = 0;
+
+    } else if (raw_temp > 39921) { // +61.6°C
+        temp = 254;
+
+    } else {
+        // convert -40°C - +61.6°C to 0-254, math round one decimal place
+        raw_temp = (((int32_t)raw_temp - 1872) * 2540) / (39921 - 1872);
+        raw_temp = round10(raw_temp);
+        temp = raw_temp / 10;
+    }
+
+    // convert 0-100% to 0-250, math round one decimal place
+    raw_humidity = (uint32_t)raw_humidity * 2500 / 65535;
+    raw_humidity = round10(raw_humidity);
+    humidity = raw_humidity / 10;
+
+    debug("Temperature: %u*C, humidity: %u%%\n", (temp * 4) - 400, humidity * 4);
 }
 
 void readBatteryPercentage() {
-    if (!gauge.getRemainingPercentage(&global.data.batt)) {
+    if (!gauge.getRemainingPercentage(&batt_percentage)) {
         debug("Get batt remaining failed\n");
         return;
     }
 
-    debug("Batt remaining: %u%%\n", global.data.batt);
+    debug("Batt remaining: %u%%\n", batt_percentage);
 }
 
 void send() {
+    // Initializing it this was is recommended due to a fact that underling UART instance
+    // is destroyed once this function ends, therefore consumes less energy.
     Wisol wisol(WISOL_TX, WISOL_RX);
+    uint8_t data[3];
 
     if (!wisol.init()) {
         debug("Wisol init failed\n");
         return;
     }
 
-    debug("Sending: t: %u, h: %u, b :%u\n", global.data.temp, global.data.humidity, global.data.batt);
+    debug("Sending: t: %02X, h: %02X, b: %02X\n", temp, humidity, batt_percentage);
+    data[0] = temp;
+    data[1] = humidity;
+    data[2] = batt_percentage;
 
-    if (wisol.sendFrame(global.packet, sizeof(global.packet))) {
+    if (wisol.sendFrame(data, sizeof(data))) {
         debug("Sent\n");
+
+    } else {
+        debug("Sending failed");
     }
 }
 
@@ -83,7 +100,7 @@ int main() {
         }
 
         if (gauge.startGauge()) {
-            readTemp();
+            readSensor();
             readBatteryPercentage();
             send();
 
