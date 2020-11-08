@@ -150,8 +150,8 @@ typedef enum {
     // Standardized button names
     LED1 = PB_8,
     BUTTON1     = USER_BUTTON,
-    SERIAL_TX   = PA_2,
-    SERIAL_RX   = PA_3,
+    SERIAL_TX   = STDIO_UART_TX,
+    SERIAL_RX   = STDIO_UART_RX,
     USBTX       = STDIO_UART_TX,
     USBRX       = STDIO_UART_RX,
     I2C_SCL     = PB_6,
