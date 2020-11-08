@@ -15,6 +15,7 @@ jobs:
       - name: Prepare
         id: prepare
         run: |
+          mkdir ./assets
           git fetch --prune --unshallow --tags
 
           CURRENT_TAG=$(git tag --points-at HEAD)
@@ -35,23 +36,22 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install mbed-cli
-          mkdir ./assets
 
       - name: Install dependencies
         run: |
           mbed deploy
 
-      - name: Build main
+      - name: Build
         if: success()
         run: |
           mbed compile -t GCC_ARM -m SIGFOX_TEMP_V1 --profile release
-          mv ./BUILD/GCC_ARM-RELEASE/sigfox-th-sensor.bin ./assets/main.bin
+          mv ./BUILD/SIGFOX_TEMP_V1/GCC_ARM-RELEASE/sigfox-th-sensor.bin ./assets/main.bin
 
-      - name: Build main - verbose
+      - name: "Build: verbose"
         if: success()
         run: |
           mbed compile -t GCC_ARM -m SIGFOX_TEMP_V1
-          mv ./BUILD/GCC_ARM/sigfox-th-sensor.bin ./assets/main_verbose.bin
+          mv ./BUILD/SIGFOX_TEMP_V1/GCC_ARM/sigfox-th-sensor.bin ./assets/main_verbose.bin
 
       - name: Create release
         if: ${{ success() && steps.prepare.outputs.version != null }}
