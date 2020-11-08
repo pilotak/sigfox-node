@@ -95,7 +95,14 @@ int main() {
     if (gauge.init(&i2c)) {
         if (button_state == false) {
             debug("Button is pressed\n");
-            gauge.newBattery();
+
+            if (gauge.newBattery()) {
+                debug("New battery set");
+
+            } else {
+                debug("New battery failed");
+            }
+
             ThisThread::sleep_for(100ms);
         }
 
