@@ -3,15 +3,7 @@
 [![build](https://github.com/pilotak/sigfox-th-sensor/workflows/build/badge.svg)](https://github.com/pilotak/sigfox-th-sensor/actions)
 [![Framework Badge mbed](https://img.shields.io/badge/framework-mbed-008fbe.svg)](https://os.mbed.com/)
 
-<p float="left">
-  <img src="./images/1.jpg" width="450" />
-  <img src="./images/2.jpg" width="450" /> 
-</p>
-
-<p float="left">
-  <img src="./images/3.jpg" width="450" />
-  <img src="./images/4.jpg" width="450" /> 
-</p>
+![Image](./images/image.jpg)
 
 ## Calibration
 
