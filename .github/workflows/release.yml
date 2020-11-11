@@ -16,6 +16,7 @@ jobs:
         id: prepare
         run: |
           git fetch --prune --unshallow --tags
+          mkdir ./assets
 
           CURRENT_TAG=$(git tag --points-at HEAD)
           echo ::set-output name=version::${CURRENT_TAG//v}
@@ -36,26 +37,24 @@ jobs:
           python -m pip install --upgrade pip
           pip install wheel mbed-cli
 
-      - name: Dir handling
-        run: |
-          cd ./code
-          mkdir ./assets
-
       - name: Install dependencies
         run: |
+          cd ./code
           mbed deploy
 
       - name: Build
         if: success()
         run: |
+          cd ./code
           mbed compile -t GCC_ARM -m SIGFOX_TEMP_V1 --profile release
-          mv "./BUILD/SIGFOX_TEMP_V1/GCC_ARM-RELEASE/sigfox-th-sensor.bin" "./assets/FW_${{ steps.prepare.outputs.version }}.bin"
+          mv "./BUILD/SIGFOX_TEMP_V1/GCC_ARM-RELEASE/sigfox-th-sensor.bin" "../assets/FW_${{ steps.prepare.outputs.version }}.bin"
 
       - name: "Build: verbose"
         if: success()
         run: |
+          cd ./code
           mbed compile -t GCC_ARM -m SIGFOX_TEMP_V1
-          mv "./BUILD/SIGFOX_TEMP_V1/GCC_ARM/sigfox-th-sensor.bin" "./assets/FW_${{ steps.prepare.outputs.version }}_verbose.bin"
+          mv "./BUILD/SIGFOX_TEMP_V1/GCC_ARM/sigfox-th-sensor.bin" "../assets/FW_${{ steps.prepare.outputs.version }}_verbose.bin"
 
       - name: Create release
         if: ${{ success() && steps.prepare.outputs.version != null }}
