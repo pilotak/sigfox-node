@@ -5,14 +5,17 @@ on:
     tags:
       - "v*"
 
+defaults:
+  run:
+    working-directory: ./code
+
 jobs:
   release:
     runs-on: ubuntu-latest
-    working-directory: code
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      
+
       - name: Prepare
         id: prepare
         run: |
