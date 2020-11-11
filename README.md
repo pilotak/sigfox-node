@@ -3,6 +3,10 @@
 [![build](https://github.com/pilotak/sigfox-th-sensor/workflows/build/badge.svg)](https://github.com/pilotak/sigfox-th-sensor/actions)
 [![Framework Badge mbed](https://img.shields.io/badge/framework-mbed-008fbe.svg)](https://os.mbed.com/)
 
+:-------------------------:|:-------------------------:
+![PCB 1](./images/1.jpg)  |  ![PCB 2](./images/2.jpg)
+![Case 1](./images/3.jpg)  |  ![Case 2](./images/4.jpg)
+
 ## Calibration
 
 Below you can find details how to calibrate the battery gauge

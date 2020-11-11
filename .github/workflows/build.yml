@@ -35,6 +35,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install wheel mbed-cli
 
+      - name: Dir handling
+        run: |
+          cd ./code
+
       - name: Install dependencies
         run: |
           mbed deploy
