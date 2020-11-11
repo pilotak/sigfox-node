@@ -15,6 +15,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    working-directory: code
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -37,11 +38,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd ./code && mbed deploy
+          mbed deploy
           cd ./mbed-os && pip install -r requirements.txt
 
       - name: Build
         if: success()
         run: |
-          cd ./code
           mbed compile -t GCC_ARM -m SIGFOX_TEMP_V1

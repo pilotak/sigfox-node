@@ -8,6 +8,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    working-directory: code
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -39,22 +40,20 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd ./code && mbed deploy
+          mbed deploy
           cd ./mbed-os && pip install -r requirements.txt
 
       - name: Build
         if: success()
         run: |
-          cd ./code
           mbed compile -t GCC_ARM -m SIGFOX_TEMP_V1 --profile release
-          mv "./BUILD/SIGFOX_TEMP_V1/GCC_ARM-RELEASE/sigfox-th-sensor.bin" "../assets/FW_${{ steps.prepare.outputs.version }}.bin"
+          mv "./BUILD/SIGFOX_TEMP_V1/GCC_ARM-RELEASE/sigfox-th-sensor.bin" "./assets/FW_${{ steps.prepare.outputs.version }}.bin"
 
       - name: "Build: verbose"
         if: success()
         run: |
-          cd ./code
           mbed compile -t GCC_ARM -m SIGFOX_TEMP_V1
-          mv "./BUILD/SIGFOX_TEMP_V1/GCC_ARM/sigfox-th-sensor.bin" "../assets/FW_${{ steps.prepare.outputs.version }}_verbose.bin"
+          mv "./BUILD/SIGFOX_TEMP_V1/GCC_ARM/sigfox-th-sensor.bin" "./assets/FW_${{ steps.prepare.outputs.version }}_verbose.bin"
 
       - name: Create release
         if: ${{ success() && steps.prepare.outputs.version != null }}
