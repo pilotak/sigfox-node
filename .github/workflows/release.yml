@@ -19,7 +19,7 @@ jobs:
       - name: Prepare
         id: prepare
         run: |
-          git fetch --prune --unshallow --tags
+          git fetch --prune --unshallow --tags -f
           mkdir ./assets
 
           CURRENT_TAG=$(git tag --points-at HEAD)
@@ -49,14 +49,14 @@ jobs:
       - name: Build
         if: success()
         run: |
-          mbed compile -t GCC_ARM -m SIGFOX_TEMP_V1 --profile release
-          mv "./BUILD/SIGFOX_TEMP_V1/GCC_ARM-RELEASE/sigfox-th-sensor.bin" "./assets/FW_${{ steps.prepare.outputs.version }}.bin"
+          mbed compile -t GCC_ARM -m SIGFOX_TH_V1 --profile release
+          mv "./BUILD/SIGFOX_TH_V1/GCC_ARM-RELEASE/sigfox-th-sensor.bin" "./assets/FW_${{ steps.prepare.outputs.version }}.bin"
 
       - name: "Build: verbose"
         if: success()
         run: |
-          mbed compile -t GCC_ARM -m SIGFOX_TEMP_V1
-          mv "./BUILD/SIGFOX_TEMP_V1/GCC_ARM/sigfox-th-sensor.bin" "./assets/FW_${{ steps.prepare.outputs.version }}_verbose.bin"
+          mbed compile -t GCC_ARM -m SIGFOX_TH_V1
+          mv "./BUILD/SIGFOX_TH_V1/GCC_ARM/sigfox-th-sensor.bin" "./assets/FW_${{ steps.prepare.outputs.version }}_verbose.bin"
 
       - name: Create release
         if: ${{ success() && steps.prepare.outputs.version != null }}
@@ -72,8 +72,6 @@ jobs:
           echo "" >>"CHANGELOG.md"
           echo "## :bookmark_tabs: Changes" >>"CHANGELOG.md"
           git log --pretty=format:"- %s %H%n" $(git describe --abbrev=0 --tags $(git describe --tags --abbrev=0)^)...$(git describe --tags --abbrev=0) >>"CHANGELOG.md"
-
-          cat "CHANGELOG.md"
 
           hub release create "${assets[@]}" "--file" "CHANGELOG.md" "$(git tag --points-at HEAD)"
         env:

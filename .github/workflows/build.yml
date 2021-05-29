@@ -47,4 +47,4 @@ jobs:
       - name: Build
         if: success()
         run: |
-          mbed compile -t GCC_ARM -m SIGFOX_TEMP_V1
+          mbed compile -t GCC_ARM -m SIGFOX_TH_V1

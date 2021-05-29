@@ -21,7 +21,7 @@
       "platform.minimal-printf-enable-floating-point": true,
       "platform.minimal-printf-set-floating-point-max-decimals": 6
     },
-    "SIGFOX_TEMP_V1": {
+    "SIGFOX_TH_V1": {
       "target.c_lib": "small",
       "platform.minimal-printf-enable-floating-point": false,
       "platform.stdio-minimal-console-only": true
