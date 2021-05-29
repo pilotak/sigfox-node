@@ -55,7 +55,7 @@ jobs:
       - name: "Build: verbose"
         if: success()
         run: |
-          mbed compile -t GCC_ARM -m SIGFOX_TH_V1
+          mbed compile -t GCC_ARM -m SIGFOX_TH_V1 --profile release
           mv "./BUILD/SIGFOX_TH_V1/GCC_ARM/sigfox-th-sensor.bin" "./assets/FW_${{ steps.prepare.outputs.version }}_verbose.bin"
 
       - name: Create release

@@ -14,13 +14,6 @@
       "platform.fatal-error-auto-reboot-enabled": true,
       "target.printf_lib": "std"
     },
-    "NUCLEO_G071RB": {
-      "mbed-trace.enable": true,
-      "platform.error-all-threads-info": true,
-      "platform.error-filename-capture-enabled": true,
-      "platform.minimal-printf-enable-floating-point": true,
-      "platform.minimal-printf-set-floating-point-max-decimals": 6
-    },
     "SIGFOX_TH_V1": {
       "target.c_lib": "small",
       "platform.minimal-printf-enable-floating-point": false,
