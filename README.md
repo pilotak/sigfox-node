@@ -6,6 +6,10 @@ Outdoor battery powered temperature & humidity IOT sensor with integrated Sigfox
 
 All data are sent to Sigfox backend, in order to save them to ie.: InfluxDB you can use  [Sigfox to InfluxDB convertor](https://github.com/pilotak/docker-sigfox-influxdb).
 
+<p align="center">
+  <img src="./images/OSHW_mark_CZ000003.png " alt="logo" height="100">
+</p>
+
 ![Sigfox TH sensor](./images/image.jpg)
 
 For more information please visit [wiki](./wiki)
